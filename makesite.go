@@ -18,8 +18,9 @@ type Page struct {
 }
 
 func main() {
-	// Define a flag named "file" to specify the name of the input text file
+	// Define a flag for the input file name
 	fileName := flag.String("file", "first-post.txt", "Name of the input .txt file")
+	// Parse the flags - required to access the flag values
 	flag.Parse()
 
 	// Trim the file extension from the file name
@@ -35,7 +36,9 @@ func main() {
 
 	// Read the contents of the input text file
 	fileContents, err := os.ReadFile(page.TextFilePath)
+	// Handle any errors that occur during file reading
 	if err != nil {
+		// Print the error message and exit the program
 		panic(err)
 	}
 
@@ -47,9 +50,11 @@ func main() {
 
 	// Create a new HTML file with the appropriate name
 	htmlFile, err := os.Create(page.HTMLPagePath)
+	// Handle any errors that occur during file creation
 	if err != nil {
 		panic(err)
 	}
+	// Defer the closing of the HTML file until the function completes
 	defer htmlFile.Close()
 
 	// Execute the template with the Page instance's data and write to the HTML file
@@ -58,5 +63,6 @@ func main() {
 		panic(err)
 	}
 
+	// Print a message to the console indicating the successful creation of the HTML file
 	fmt.Printf("HTML template written to %s\n", page.HTMLPagePath)
 }
