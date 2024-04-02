@@ -1,10 +1,76 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>makesite</title>
-  </head>
-  <body>
-    Yar Pirate Ipsum
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>makesite</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      background-image: url('/images/groovy.jpg'); 
+      background-size: cover;
+      background-attachment: fixed;
+      font-family: 'Bangers', cursive; 
+      color: #fff; 
+    }
+    .header-img {
+      background-image: url('images/groovy.jpg'); 
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .content-container {
+      background-color: rgba(255, 255, 255, 0.85); 
+      border-radius: 0.5rem;
+      margin-top: -150px; 
+      padding: 2rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
+    }
+    h1 {
+      font-size: 4rem; 
+      color: #f2dc5d;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6); 
+    }
+    p {
+      font-size: 1.25rem; 
+      font-family: 'Arial', sans-serif; 
+      color: #000; 
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7); 
+    }
+    .fun-btn {
+      background-color: #c83f49; 
+      color: #fff;
+      font-size: 1.5rem;
+      padding: 0.75rem 3rem;
+      border-radius: 30px; 
+      margin-top: 1rem;
+      border: 2px solid #fff; 
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .fun-btn:hover {
+      background-color: #e84a5f;
+      transform: scale(1.1); 
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="header-img">
+    <h1>Welcome to Makesite!</h1>
+  </header>
+  <div class="container content-container text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <p>Yar Pirate Ipsum
 
 
 Prow scuttle parrel provost Sail ho shrouds spirits boom mizzenmast yardarm. Pinnace holystone mizzenmast quarter crow&#39;s nest nipperkin grog yardarm hempen halter furl. Swab barque interloper chantey doubloon starboard grog black jack gangway rutters.
@@ -12,6 +78,12 @@ Prow scuttle parrel provost Sail ho shrouds spirits boom mizzenmast yardarm. Pin
 Deadlights jack lad schooner scallywag dance the hempen jig carouser broadside cable strike colors. Bring a spring upon her cable holystone blow the man down spanker Shiver me timbers to go on account lookout wherry doubloon chase. Belay yo-ho-ho keelhaul squiffy black spot yardarm spyglass sheet transom heave to.
 
 Trysail Sail ho Corsair red ensign hulk smartly boom jib rum gangway. Case shot Shiver me timbers gangplank crack Jennys tea cup ballast Blimey lee snow crow&#39;s nest rutters. Fluke jib scourge of the seven seas boatswain schooner gaff booty Jack Tar transom spirits.
-
-  </body>
+</p>
+        <button class="fun-btn">Read More</button>
+      </div>
+    </div>
+  </div>
+</body>
 </html>
+
+
