@@ -1,8 +1,11 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"html/template"
 	"os"
+	"strings"
 )
 
 // Page holds all the information needed to generate a new HTML page
@@ -15,38 +18,45 @@ type Page struct {
 }
 
 func main() {
-	// Read the contents of first-post.txt
-	content, err := os.ReadFile("first-post.txt")
-	if err != nil {
-		panic(err)
-	}
+	// Define a flag named "file" to specify the name of the input text file
+	fileName := flag.String("file", "first-post.txt", "Name of the input .txt file")
+	flag.Parse()
+
+	// Trim the file extension from the file name
+	textFileName := strings.TrimSuffix(*fileName, ".txt")
 
 	// Create a Page instance with relevant information
 	page := Page{
-		TextFilePath: "first-post.txt",
-		TextFileName: "first-post",
-		HTMLPagePath: "first-post.html",
-		Content:      string(content),
+		TextFilePath: *fileName,
+		TextFileName: textFileName,
+		HTMLPagePath: textFileName + ".html",
+		Content:      "",
 	}
+
+	// Read the contents of the input text file
+	fileContents, err := os.ReadFile(page.TextFilePath)
+	if err != nil {
+		panic(err)
+	}
+
+	// Assign the content of the text file to the Page instance
+	page.Content = string(fileContents)
 
 	// Create a new template in memory named "template.tmpl"
-	t := template.Must(template.New("template.tmpl").ParseFiles("template.tmpl"))
+	tmpl := template.Must(template.New("template.tmpl").ParseFiles("template.tmpl"))
 
-	// Create a new, blank HTML file
-	newFile, err := os.Create("first-post.html")
+	// Create a new HTML file with the appropriate name
+	htmlFile, err := os.Create(page.HTMLPagePath)
 	if err != nil {
 		panic(err)
 	}
-	defer newFile.Close()
+	defer htmlFile.Close()
 
-	// Executing the template injects the Page instance's data,
-	// allowing us to render the content of our text file.
-	// Furthermore, upon execution, the rendered template will be
-	// saved inside the new file we created earlier.
-	err = t.Execute(newFile, page)
+	// Execute the template with the Page instance's data and write to the HTML file
+	err = tmpl.Execute(htmlFile, page)
 	if err != nil {
 		panic(err)
 	}
 
-	println("HTML template written to first-post.html")
+	fmt.Printf("HTML template written to %s\n", page.HTMLPagePath)
 }
