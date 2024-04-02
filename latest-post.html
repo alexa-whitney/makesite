@@ -7,14 +7,16 @@
   
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
-  
   <style>
+      @font-face {
+      font-family: 'SuperFunky';
+      src: url('/fonts/SuperFunky.ttf') format('truetype');
+    }
+
     body {
       background-image: url('/images/groovy.jpg'); 
       background-size: cover;
       background-attachment: fixed;
-      font-family: 'Bangers', cursive; 
       color: #fff; 
     }
     .header-img {
@@ -27,17 +29,20 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
     .content-container {
-      background-color: rgba(255, 255, 255, 0.85); 
+      background-color: rgba(255, 255, 255, 0.7); 
       border-radius: 0.5rem;
       margin-top: -150px; 
-      padding: 2rem;
+      padding: 4rem;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
     }
     h1 {
+      font-family: 'SuperFunky', cursive; 
       font-size: 4rem; 
-      color: #f2dc5d;
+      color: #000000;
       margin-bottom: 0.5rem;
-      text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6); 
+      text-shadow:
+        5px 5px 0 #ffffff, 
+        6px 6px 0 rgba(0, 0, 0, 0.2); 
     }
     p {
       font-size: 1.25rem; 
@@ -47,7 +52,8 @@
     }
     .fun-btn {
       background-color: #c83f49; 
-      color: #fff;
+      color: #ffffff;
+      font-family: 'SuperFunky';
       font-size: 1.5rem;
       padding: 0.75rem 3rem;
       border-radius: 30px; 
