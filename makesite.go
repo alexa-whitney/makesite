@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/logrusorgru/aurora/v4"
 )
@@ -28,17 +29,32 @@ func main() {
 	// Parse the flags
 	flag.Parse()
 
+	// Timer starts
+	startTime := time.Now()
+
+	// Counters for pages generated and total size
+	pagesGenerated := 0
+	totalSize := int64(0)
+
 	// If the dir flag is provided, list all .txt files in the given directory
 	if *fileName == "" {
-		// Directory listing message in bold and a color
-		fmt.Println(aurora.Bold(aurora.BrightYellow(fmt.Sprintf("List of .txt files in directory '%s':", *dirName))))
+		// Print the list of .txt files in the directory
+		fmt.Println(aurora.Bold(aurora.BgBrightRed(fmt.Sprintf("List of .txt files in directory '%s':", *dirName))))
+		// Walk the directory and list all .txt files
 		err := filepath.Walk(*dirName, func(path string, info os.FileInfo, err error) error {
+			// Check if the file is a .txt file
 			if err != nil {
 				return err
 			}
+			// If the file is a .txt file, generate an HTML page
 			if !info.IsDir() && strings.HasSuffix(info.Name(), ".txt") {
-				// Generate HTML page for each .txt file found
-				generateHTMLPage(filepath.Join(*dirName, info.Name()))
+				size, err := generateHTMLPage(filepath.Join(*dirName, info.Name()))
+				if err != nil {
+					return err
+				}
+				pagesGenerated++                                                                                                          // Increment the counter
+				totalSize += size                                                                                                         // Add the size of the generated HTML page to the total size
+				fmt.Printf("%s %s\n", aurora.Bold(aurora.Green("HTML template written to")), aurora.Italic(aurora.BgBrightMagenta(path))) // Print the path of the generated HTML page
 			}
 			return nil
 		})
@@ -46,71 +62,89 @@ func main() {
 			fmt.Println("Error:", err)
 			os.Exit(1)
 		}
-		os.Exit(0)
-	}
-
-	// If both file and dir flags are provided, exit with an error
-	if *fileName != "" && *dirName != "" {
-		fmt.Println("Error: Please provide either the 'file' flag or the 'dir' flag, not both.")
-		os.Exit(1)
-	}
-
-	// Construct the full path of the text file
-	filePath := fmt.Sprintf("%s/%s", *dirName, *fileName)
-
-	// Check if the provided file exists
-	_, err := os.Stat(filePath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Printf("Error: File '%s' does not exist in directory '%s'\n", *fileName, *dirName)
+	} else { // Else branch to handle single file conversion
+		filePath := fmt.Sprintf("%s/%s", *dirName, *fileName)
+		_, err := os.Stat(filePath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				fmt.Printf("Error: File '%s' does not exist in directory '%s'\n", *fileName, *dirName)
+				os.Exit(1)
+			}
+			fmt.Println("Error:", err)
 			os.Exit(1)
 		}
-		fmt.Println("Error:", err)
-		os.Exit(1)
+		size, err := generateHTMLPage(filePath)
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
+		pagesGenerated++
+		totalSize += size
 	}
 
-	// Generate HTML page for the specified .txt file
-	generateHTMLPage(filePath)
+	// Calculate the total size in kilobytes with one significant digit after the decimal
+	totalSizeKb := float64(totalSize) / 1024 // Convert bytes to kilobytes
+
+	// Duration of execution
+	duration := time.Since(startTime)
+
+	// Success message parts with color and style
+	successPart := aurora.Bold(aurora.Green("Success!")).String() // The word "Success!" is bold and green
+	countPart := aurora.Bold(pagesGenerated).String()             // The count is bold
+	pagesPart := "pages"
+	sizePart := fmt.Sprintf("(%.1fKB total)", totalSizeKb)
+	timePart := fmt.Sprintf("in %.2f seconds.", duration.Seconds())
+
+	// Combine parts with different styles
+	successMessage := fmt.Sprintf("%s Generated %s %s %s %s",
+		successPart,
+		countPart,
+		aurora.Bold(aurora.Cyan(pagesPart)).String(),
+		aurora.Bold(aurora.BrightYellow(sizePart)).String(),
+		aurora.Bold(aurora.BrightBlue(timePart)).String(),
+	)
+
+	// Print the formatted success message
+	fmt.Println(successMessage)
 }
 
-// generateHTMLPage generates an HTML page for the given text file
-func generateHTMLPage(filePath string) {
-	// Read the contents of the input text file
+// generateHTMLPage reads the content of a text file and generates an HTML page
+func generateHTMLPage(filePath string) (int64, error) {
+	// Read the content of the text file
 	fileContents, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
+		return 0, err
 	}
 
-	// Trim the file extension from the file name
+	// Create a Page struct with the file content
 	textFileName := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
-
-	// Create a Page instance with relevant information
 	page := Page{
-		TextFilePath: filePath,
-		TextFileName: textFileName,
-		HTMLPagePath: textFileName + ".html",
-		Content:      string(fileContents),
+		TextFilePath: filePath,               // The full path to the text file
+		TextFileName: textFileName,           // The name of the text file without the extension
+		HTMLPagePath: textFileName + ".html", // The name of the HTML file to be generated
+		Content:      string(fileContents),   // The content of the text file
 	}
 
-	// Create a new template in memory named "template.tmpl"
+	// Create an HTML file from the template
 	tmpl := template.Must(template.New("template.tmpl").ParseFiles("template.tmpl"))
-
-	// Create a new HTML file with the appropriate name
+	// Create the HTML file
 	htmlFile, err := os.Create(page.HTMLPagePath)
 	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
+		return 0, err
 	}
+	// Close the file when the function returns
 	defer htmlFile.Close()
 
-	// Execute the template with the Page instance's data and write to the HTML file
 	err = tmpl.Execute(htmlFile, page)
 	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
+		return 0, err
 	}
 
-	// Print a message to the console indicating the successful creation of the HTML file
-	fmt.Printf("%s %s\n", aurora.Bold(aurora.Green("HTML template written to")), aurora.Italic(aurora.BgBrightMagenta(page.HTMLPagePath)))
+	// Get the file info to calculate the size
+	fileInfo, err := htmlFile.Stat()
+	if err != nil {
+		return 0, err
+	}
+
+	return fileInfo.Size(), nil
 }
