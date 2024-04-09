@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/logrusorgru/aurora/v4"
 )
 
 // Page holds all the information needed to generate a new HTML page
@@ -28,7 +30,8 @@ func main() {
 
 	// If the dir flag is provided, list all .txt files in the given directory
 	if *fileName == "" {
-		fmt.Printf("List of .txt files in directory '%s':\n", *dirName)
+		// Directory listing message in bold and a color
+		fmt.Println(aurora.Bold(aurora.BrightYellow(fmt.Sprintf("List of .txt files in directory '%s':", *dirName))))
 		err := filepath.Walk(*dirName, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -109,5 +112,5 @@ func generateHTMLPage(filePath string) {
 	}
 
 	// Print a message to the console indicating the successful creation of the HTML file
-	fmt.Printf("HTML template written to %s\n", page.HTMLPagePath)
+	fmt.Printf("%s %s\n", aurora.Bold(aurora.Green("HTML template written to")), aurora.Italic(aurora.BgBrightMagenta(page.HTMLPagePath)))
 }
